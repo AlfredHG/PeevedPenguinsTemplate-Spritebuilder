@@ -256,7 +256,7 @@
 					<key>type</key>
 					<string>Float</string>
 					<key>value</key>
-					<real>150</real>
+					<real>10</real>
 				</dict>
 				<dict>
 					<key>name</key>
