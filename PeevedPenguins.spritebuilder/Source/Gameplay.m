@@ -22,9 +22,7 @@
 - (void)didLoadFromCCB {
     // visualize physics bodies & joints
     _physicsNode.debugDraw = TRUE;
-    
-    [_physicsNode addChild: _mouseJointNode];
-    
+        
     // tell this scene to accept touches
     self.userInteractionEnabled = TRUE;
     
