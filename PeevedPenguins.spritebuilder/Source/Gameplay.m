@@ -16,6 +16,10 @@
     CCNode *_pullbackNode;
     CCNode *_mouseJointNode;
     CCPhysicsJoint *_mouseJoint;
+    
+    //penguin
+    CCNode *_currentPenguin;
+    CCPhysicsJoint *_penguinCatapultJoint;
 }
 
 // is called when CCB file has completed loading
@@ -47,6 +51,20 @@
         
         // setup a spring joint between the mouseJointNode and the catapultArm
         _mouseJoint = [CCPhysicsJoint connectedSpringJointWithBodyA:_mouseJointNode.physicsBody bodyB:_catapultArm.physicsBody anchorA:ccp(0, 0) anchorB:ccp(34, 138) restLength:0.f stiffness:3000.f damping:150.f];
+        
+        //create a penguin
+        _currentPenguin = [CCBReader load: @"Penguin"];
+        // posiziona sul braccio
+        CGPoint penguinPosition = [_catapultArm convertToWorldSpace:ccp(34, 138)];
+        // transform world position to node space
+        _currentPenguin.position = [_physicsNode convertToNodeSpace:penguinPosition];
+        // add to the physics world
+        [_physicsNode addChild: _currentPenguin];
+        // no rotation
+        _currentPenguin.physicsBody.allowsRotation = NO;
+        
+        // creo un joint per tener fermo il pinguino
+        _penguinCatapultJoint = [CCPhysicsJoint connectedPivotJointWithBodyA:_currentPenguin.physicsBody bodyB:_catapultArm.physicsBody anchorA:_currentPenguin.anchorPointInPoints];
     }
 }
 - (void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
@@ -68,6 +86,16 @@
         // releases the jount and lets the catapult snap back
         [_mouseJoint invalidate];
         _mouseJoint = nil;
+        
+        [_penguinCatapultJoint invalidate];
+        _penguinCatapultJoint = nil;
+        
+        // dopo il lancio ok rotation
+        _currentPenguin.physicsBody.allowsRotation = YES;
+        
+        // follow the flying peng
+        CCActionFollow *follow = [CCActionFollow actionWithTarget:_currentPenguin worldBoundary:self.boundingBox];
+        [_contentNode runAction:follow];
     }
 }
 
