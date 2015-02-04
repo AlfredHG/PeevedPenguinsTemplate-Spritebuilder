@@ -13,6 +13,7 @@
     CCNode *_levelNode;
     CCNode *_contentNode;
     CCNode *_catapultArm;
+    CCNode *_pullbackNode;
 }
 
 // is called when CCB file has completed loading
@@ -26,6 +27,9 @@
     // load level
     CCScene *level = [CCBReader loadAsScene:@"Levels/Level1"];
     [_levelNode addChild:level];
+    
+    // nothing shall collide with our invisible nodes
+    _pullbackNode.physicsBody.collisionMask = @[];
 }
 
 // called on every touch in this scene
