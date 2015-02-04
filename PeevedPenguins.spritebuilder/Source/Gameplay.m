@@ -13,23 +13,27 @@
     CCNode *_catapultArm;
 }
 
+// is called when CCB file has completed loading
 - (void)didLoadFromCCB {
+    // tell this scene to accept touches
     self.userInteractionEnabled = TRUE;
 }
 
-- (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
+// called on every touch in this scene
+- (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
     [self launchPenguin];
 }
 
 - (void)launchPenguin {
-    //load the penguin.ccb
-    CCNode *penguin = [CCBReader load:@"Penguin"];
+    // loads the Penguin.ccb we have set up in Spritebuilder
+    CCNode* penguin = [CCBReader load:@"Penguin"];
+    // position the penguin at the bowl of the catapult
     penguin.position = ccpAdd(_catapultArm.position, ccp(16, 50));
     
-    //add penguin to the physics node
+    // add the penguin to the physicsNode of this scene (because it has physics enabled)
     [_physicsNode addChild:penguin];
     
-    //manually create and apply a force
+    // manually create & apply a force to launch the penguin
     CGPoint launchDirection = ccp(1, 0);
     CGPoint force = ccpMult(launchDirection, 8000);
     [penguin.physicsBody applyForce:force];
