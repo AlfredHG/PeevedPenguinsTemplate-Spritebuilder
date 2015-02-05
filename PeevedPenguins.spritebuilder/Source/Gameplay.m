@@ -8,6 +8,9 @@
 
 #import "Gameplay.h"
 #import "CCPhysics+ObjectiveChipmunk.h"
+#import "Penguin.h"
+
+static const float MIN_SPEED = 5.f;
 
 @implementation Gameplay {
     CCPhysicsNode *_physicsNode;
@@ -19,8 +22,9 @@
     CCPhysicsJoint *_mouseJoint;
     
     //penguin
-    CCNode *_currentPenguin;
+    Penguin *_currentPenguin;
     CCPhysicsJoint *_penguinCatapultJoint;
+    CCAction *_followPenguin;
 }
 
 // is called when CCB file has completed loading
@@ -41,6 +45,32 @@
     _mouseJointNode.physicsBody.collisionMask = @[];
 }
 
+// method called every frame
+- (void) update:(CCTime)delta {
+    if (_currentPenguin.launched) {
+        //if speed is below minimum speed assume attempt is over
+        // questa espressione calcola la lunghezza del vettore!!!!!!
+        if (ccpLength(_currentPenguin.physicsBody.velocity) < MIN_SPEED) {
+            [self nextAttempt];
+            return;
+        }
+        
+        int xMin = _currentPenguin.boundingBox.origin.x;
+        
+        if (xMin < self.boundingBox.origin.x) {
+            [self nextAttempt];
+            return;
+        }
+        
+        int xMax = xMin + _currentPenguin.boundingBox.size.width;
+        
+        if (xMax > (self.boundingBox.origin.x + self.boundingBox.size.width)){
+            [self nextAttempt];
+            return;
+        }
+    }
+}
+
 // called on every touch in this scene
 -(void) touchBegan:(CCTouch *)touch withEvent:(UIEvent *)event {
     CGPoint touchLocation = [touch locationInNode:_contentNode];
@@ -55,7 +85,7 @@
         _mouseJoint = [CCPhysicsJoint connectedSpringJointWithBodyA:_mouseJointNode.physicsBody bodyB:_catapultArm.physicsBody anchorA:ccp(0, 0) anchorB:ccp(34, 138) restLength:0.f stiffness:3000.f damping:150.f];
         
         //create a penguin
-        _currentPenguin = [CCBReader load: @"Penguin"];
+        _currentPenguin = (Penguin*)[CCBReader load: @"Penguin"];
         // posiziona sul braccio
         CGPoint penguinPosition = [_catapultArm convertToWorldSpace:ccp(34, 138)];
         // transform world position to node space
@@ -96,8 +126,10 @@
         _currentPenguin.physicsBody.allowsRotation = YES;
         
         // follow the flying peng
-        CCActionFollow *follow = [CCActionFollow actionWithTarget:_currentPenguin worldBoundary:self.boundingBox];
-        [_contentNode runAction:follow];
+        _followPenguin = [CCActionFollow actionWithTarget:_currentPenguin worldBoundary:self.boundingBox];
+        [_contentNode runAction:_followPenguin];
+        
+        _currentPenguin.launched = YES;
     }
 }
 
@@ -123,6 +155,14 @@
 
 - (void)retry {
     [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+}
+
+- (void)nextAttempt {
+    _currentPenguin = nil;
+    [_contentNode stopAction:_followPenguin];
+    
+    CCActionMoveTo *actionMoveTo = [CCActionMoveTo actionWithDuration:1 position:ccp(0, 0)];
+    [_contentNode runAction:actionMoveTo];
 }
 
 // collisions
