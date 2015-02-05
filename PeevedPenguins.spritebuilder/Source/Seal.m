@@ -14,7 +14,7 @@
     self = [super init];
     
     if (self) {
-        CCLOG(@"Seal Created");
+        //CCLOG(@"Seal Created");
     }
     
     return self;
