@@ -26,7 +26,7 @@
 // is called when CCB file has completed loading
 - (void)didLoadFromCCB {
     // visualize physics bodies & joints
-    _physicsNode.debugDraw = TRUE;
+    //_physicsNode.debugDraw = TRUE;
     _physicsNode.collisionDelegate = self;
         
     // tell this scene to accept touches
