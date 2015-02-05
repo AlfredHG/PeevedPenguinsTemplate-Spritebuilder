@@ -26,6 +26,7 @@
 - (void)didLoadFromCCB {
     // visualize physics bodies & joints
     _physicsNode.debugDraw = TRUE;
+    _physicsNode.collisionDelegate = self;
         
     // tell this scene to accept touches
     self.userInteractionEnabled = TRUE;
@@ -121,6 +122,13 @@
 
 - (void)retry {
     [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+}
+
+// collisions
+
+-(void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair seal:(CCNode *)nodeA wildcard:(CCNode *)nodeB
+{
+    CCLOG(@"Something collided with a seal!");
 }
 
 @end
